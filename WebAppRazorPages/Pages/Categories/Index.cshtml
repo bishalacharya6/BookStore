@@ -1,0 +1,49 @@
+﻿@page
+@model WebAppRazorPages.Pages.Categories.IndexModel
+
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-5 fw-bold">Category List</h1>
+        <button class="btn btn-primary" id="createNewCategory">
+            <a asp-page="/Categories/Create" class="btn btn-primary" id="createNewCategory">
+                <i class="bi bi-plus-circle me-2"></i>
+                Create New Category
+            </a>
+        </button>
+    </div>
+
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">Category Name</th>
+                <th scope="col">Display Order</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var obj in Model.CategoryList)
+            {
+                <tr>
+                    <td>@obj.Name</td>
+                    <td>@obj.DisplayOrder</td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a class="btn btn-warning btn-sm"  asp-page="/categories/edit" asp-route-id="@obj.Id">
+                                <i class="bi bi-pencil-square"></i>
+                                Edit
+                            </a>
+
+                            <!-- Delete Button within a form -->
+                            <form asp-route-id="@obj.Id" method="post" asp-page-handler="Delete" class="d-inline">
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this category?');">
+                                    <i class="bi bi-trash"></i>
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

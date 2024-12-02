@@ -1,0 +1,52 @@
+﻿@page
+@model WebAppRazorPages.Pages.Categories.CreateModel
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="mb-4 fw-normal text-uppercase">Create Category</h2>
+
+                    <form method="post">
+                        <div class="mb-4">
+                            <label asp-for="Category.Name" class="form-label text-muted small"></label>
+                            <input asp-for="Category.Name" class="form-control form-control-lg bg-light" />
+                            <span asp-validation-for="Category.Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Category.DisplayOrder" class="form-label text-muted small">Display Order</label>
+                            <input asp-for="Category.DisplayOrder" class="form-control form-control-lg bg-light" />
+                            <span asp-validation-for="Category.DisplayOrder" class="text-danger"></span>
+                        </div>
+
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <button type="submit" class="btn btn-dark btn-lg px-4 text-uppercase w-100">Create</button>
+                            </div>
+                            <div class="col-auto">
+                                <a asp-page="/categories/index" class="btn btn-light btn-lg text-muted text-uppercase rounded-3 transition px-4 hover-shadow">
+                                    Back to List
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-shadow {
+        transition: all 0.2s ease-in-out !important;
+    }
+
+        .hover-shadow:hover {
+            background-color: #e9ecef !important;
+            transform: translateY(-1px);
+            box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+        }
+</style>

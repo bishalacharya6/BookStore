@@ -1,0 +1,56 @@
+﻿@model Web.Models.Catagory
+
+<div class="container py-1">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="mb-4 fw-normal text-uppercase">Create Category</h2>
+                        
+                    <form method="post">
+                        <div asp-validation-summary="All"></div>
+                        <div class="mb-4">
+                            <label asp-for="Name" class="form-label text-muted small"></label>
+                            <input asp-for="Name" class="form-control form-control-lg bg-light"/>
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                            
+                        <div class="mb-4">
+                            <label asp-for="DisplayOrder" class="form-label text-muted small">Display Order</label>
+                            <input asp-for="DisplayOrder" class="form-control form-control-lg bg-light" data-val="false" />
+                            <span asp-validation-for="DisplayOrder" class="text-danger"></span>
+                        </div>
+                            
+                        <div class="row align-items-center">
+                            <div class="col-6">
+                                <button type="submit" class="btn btn-dark btn-lg px-4 text-uppercase w-100">Create</button>
+                            </div>
+                            <div class="col-6">
+                                <a asp-controller="Catagory" asp-action="Index" class="btn btn-light w-100 btn-lg text-muted text-uppercase rounded-3 transition px-4 hover-shadow">
+                                    Back to List
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-shadow {
+        transition: all 0.2s ease-in-out !important;
+    }
+    .hover-shadow:hover {
+        background-color: #e9ecef !important;
+        transform: translateY(-1px);
+        box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+    }
+</style>
+
+@section Scripts{
+    @{
+        <partial name="_ValidationScriptsPartial"/>
+    }
+}

@@ -1,0 +1,136 @@
+﻿@model ProductViewModel
+
+<div class="container py-1">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="mb-4 fw-normal text-uppercase">@(Model.Product.Id == null? "Create" : "Update") Product</h2>
+
+                    <form method="post" enctype="multipart/form-data">
+                        <input asp-for="Product.Id" hidden/>
+                        <input asp-for="Product.ImageUrl" hidden/>
+                        <div asp-validation-summary="All"></div>
+
+                        <div class="mb-4">
+                            <label asp-for="Product.Title" class="form-label text-muted small">Product Title</label>
+                            <input asp-for="Product.Title" class="form-control form-control-lg bg-light" />
+                            <span asp-validation-for="Product.Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Product.Description" class="form-label text-muted small">Product Description</label>
+                            <textarea asp-for="Product.Description" class="form-control form-control-lg bg-light"></textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Product.ISBN" class="form-label text-muted small">ISBN</label>
+                            <input asp-for="Product.ISBN" class="form-control form-control-lg bg-light" />
+                            <span asp-validation-for="Product.ISBN" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Product.Author" class="form-label text-muted small">Author</label>
+                            <input asp-for="Product.Author" class="form-control form-control-lg bg-light" />
+                            <span asp-validation-for="Product.Author" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Product.ListPrice" class="form-label text-muted small">List Price</label>
+                            <input asp-for="Product.ListPrice" class="form-control form-control-lg bg-light" />
+                            <span asp-validation-for="Product.ListPrice" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Product.Price" class="form-label text-muted small">Price for 1-50</label>
+                            <input asp-for="Product.Price" class="form-control form-control-lg bg-light" />
+                            <span asp-validation-for="Product.Price" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Product.Price50" class="form-label text-muted small">Price for 50-100</label>
+                            <input asp-for="Product.Price50" class="form-control form-control-lg bg-light" />
+                            <span asp-validation-for="Product.Price50" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Product.Price100" class="form-label text-muted small">Price for 100+</label>
+                            <input asp-for="Product.Price100" class="form-control form-control-lg bg-light" />
+                            <span asp-validation-for="Product.Price100" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Product.CatagoryId" class="form-label text-muted small">Category</label>
+                            <select asp-for="Product.CatagoryId" asp-items="@Model.CatagoryList" class="form-select text-muted small">
+                                <option value="0" disabled selected>--Select Category--</option>
+                            </select>
+                            <span asp-validation-for="Product.CatagoryId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Product.ImageUrl" class="form-label text-muted small">Product Image</label>
+                            <input asp-for="Product.ImageUrl" type="file" name="formFile" class="form-control form-control-lg bg-light" />
+                        </div>
+                        
+                        <div class="py-4">
+                            <img src="@Model.Product.ImageUrl" width="50%" 
+                                style="border-radius: 5px; border:1px solid #bbb9b9"/>
+                        </div>
+
+                        <div class="row align-items-center">
+                            <div class="col-6">
+                                @if(Model.Product.Id == null || Model.Product.Id == 0)
+                                {
+
+                                <button type="submit" class="btn btn-dark btn-lg px-4 text-uppercase w-100">Create</button>
+                                }
+                                else 
+                                {
+                                <button type="submit" class="btn btn-dark btn-lg px-4 text-uppercase w-100">Update</button>
+                                }
+                            </div>
+                            <div class="col-6">
+                                <a asp-controller="Product" asp-action="Index" class="btn btn-light btn-lg text-muted w-100 text-uppercase rounded-3 transition px-4 hover-shadow">
+                                    Back to List
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-shadow {
+        transition: all 0.2s ease-in-out !important;
+    }
+
+        .hover-shadow:hover {
+            background-color: #e9ecef !important;
+            transform: translateY(-1px);
+            box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+        }
+</style>
+
+@section Scripts {
+    <script>
+        tinymce.init({
+            selector: 'textarea',
+            plugins: [
+                'link', 'lists', 'image', 'table', 'wordcount', 'emoticons'
+            ],
+            toolbar: 'undo redo | bold italic underline | link image table | bullist numlist | emoticons',
+            menubar: false,
+            statusbar: true,
+            paste_as_text: true, // This will force paste as plain text
+            forced_root_block: false, // Prevent automatic paragraph wrapping
+            valid_elements: 'strong,em,u'
+        });
+    </script>
+
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

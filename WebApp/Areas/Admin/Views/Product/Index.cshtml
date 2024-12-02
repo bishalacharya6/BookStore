@@ -1,0 +1,58 @@
+﻿@model IEnumerable<Product>
+
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-5 fw-bold">Product List</h1>
+        <button class="btn btn-primary" id="createNewProduct">
+            <a asp-controller="Product" asp-action="UpsertProduct" class="btn btn-primary" id="createNewProduct">
+                <i class="bi bi-plus-circle me-2"></i>
+                Create New Product
+            </a>
+        </button>
+    </div>
+
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">Title</th>
+                <th scope="col">ISBN</th>
+                <th scope="col">Description</th>
+                <th scope="col">Author</th>
+                <th scope="col">List Price</th>
+                <th scope="col">Catagory Name</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var obj in Model)
+            {
+                <tr>
+                    <td>@obj.Title</td>
+                    <td>@obj.ISBN</td>
+                    <td>@obj.Description</td>
+                    <td>@obj.Author</td>
+                    <td>@obj.ListPrice</td>
+                    <td>@obj.Catagory.Name</td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a class="btn btn-warning btn-sm" asp-controller="Product" asp-action="UpsertProduct" asp-route-id="@obj.Id">
+                                <i class="bi bi-pencil-square"></i>
+                                Edit
+                            </a>
+
+                            <!-- Delete Button within a form -->
+                            <form asp-controller="Product" asp-action="DeleteProduct" asp-route-id="@obj.Id" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this category?');">
+                                    <i class="bi bi-trash"></i>
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Include Bootstrap Icons -->

@@ -1,0 +1,94 @@
+﻿@model Web.Models.Product
+
+<div class="container py-1">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="mb-4 fw-normal text-uppercase">Update Product</h2>
+
+                    <form method="post">
+                        <div asp-validation-summary="All"></div>
+
+                        <div class="mb-4">
+                            <label asp-for="Title" class="form-label text-muted small">Product Title</label>
+                            <input asp-for="Title" class="form-control form-control-lg bg-light" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Description" class="form-label text-muted small">Product Description</label>
+                            <textarea asp-for="Description" class="form-control form-control-lg bg-light" ></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="ISBN" class="form-label text-muted small">Product ISBN</label>
+                            <input asp-for="ISBN" class="form-control form-control-lg bg-light" />
+                            <span asp-validation-for="ISBN" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Author" class="form-label text-muted small">Product Author</label>
+                            <input asp-for="Author" class="form-control form-control-lg bg-light" />
+                            <span asp-validation-for="Author" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="ListPrice" class="form-label text-muted small">Product List Price</label>
+                            <input asp-for="ListPrice" class="form-control form-control-lg bg-light" />
+                            <span asp-validation-for="ListPrice" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Price" class="form-label text-muted small">Product Price</label>
+                            <input asp-for="Price" class="form-control form-control-lg bg-light" />
+                            <span asp-validation-for="Price" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Price50" class="form-label text-muted small">Price for 50 Items</label>
+                            <input asp-for="Price50" class="form-control form-control-lg bg-light" />
+                            <span asp-validation-for="Price50" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Price100" class="form-label text-muted small">Price for 100 Items</label>
+                            <input asp-for="Price100" class="form-control form-control-lg bg-light" />
+                            <span asp-validation-for="Price100" class="text-danger"></span>
+                        </div>
+
+                        <div class="row align-items-center">
+                            <div class="col-6">
+                                <button type="submit" asp-action="EditProduct" class="btn btn-dark btn-lg px-4 text-uppercase w-100">Update</button>
+                            </div>
+                            <div class="col-6">
+                                <a asp-controller="Product" asp-action="Index" class="btn btn-light btn-lg w-100 text-muted text-uppercase rounded-3 transition px-4 hover-shadow">
+                                    Back to List
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-shadow {
+        transition: all 0.2s ease-in-out !important;
+    }
+
+        .hover-shadow:hover {
+            background-color: #e9ecef !important;
+            transform: translateY(-1px);
+            box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+        }
+</style>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
