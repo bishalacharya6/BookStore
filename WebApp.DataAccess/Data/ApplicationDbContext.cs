@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Web.Models;
 
 namespace Web.DataAccess.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) 
         {
@@ -15,7 +16,7 @@ namespace Web.DataAccess.Data
 
         public DbSet<Catagory> Catagories { get; set; }
         public DbSet<Product> Product { get; set; }
-
+        public DbSet<ApplicationUsers> ApplicationUsers { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

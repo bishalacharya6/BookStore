@@ -3,10 +3,13 @@ using Web.Models;
 using System.Collections.Generic;
 using Web.DataAccess;
 using Web.DataAccess.Repository;
+using Microsoft.AspNetCore.Authorization;
+using Web.Utility;
 
 namespace WebApp.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = ApplicationRole.Role_Admin)]
     public class CatagoryController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
