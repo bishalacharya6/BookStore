@@ -1,0 +1,85 @@
+﻿@model Company
+
+<div class="container py-1">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="mb-4 fw-normal text-uppercase">@(Model.Id == null? "Create" : "Update") Company</h2>
+
+                    <form method="post" >
+                        <input asp-for="Id" hidden/>
+                        <div asp-validation-summary="All"></div>
+
+                        <div class="mb-4">
+                            <label asp-for="Name" class="form-label text-muted small">Company Name</label>
+                            <input asp-for="Name" class="form-control form-control-lg bg-light" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="StreetAddress" class="form-label text-muted small">Street Address</label>
+                            <textarea asp-for="StreetAddress" class="form-control form-control-lg bg-light"></textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="City" class="form-label text-muted small">City</label>
+                            <input asp-for="City" class="form-control form-control-lg bg-light" />
+                            <span asp-validation-for="City" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="State" class="form-label text-muted small">State</label>
+                            <input asp-for="State" class="form-control form-control-lg bg-light" />
+                            <span asp-validation-for="State" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="PostalCode" class="form-label text-muted small">Postal Code</label>
+                            <input asp-for="PostalCode" class="form-control form-control-lg bg-light" />
+                            <span asp-validation-for="PostalCode" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="PhoneNumber" class="form-label text-muted small">Phone Number</label>
+                            <input asp-for="PhoneNumber" class="form-control form-control-lg bg-light" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="row align-items-center">
+                            <div class="col-6">
+                                @if(Model.Id == null || Model.Id == 0)
+                                {
+
+                                <button type="submit" class="btn btn-dark btn-lg px-4 text-uppercase w-100">Create</button>
+                                }
+                                else 
+                                {
+                                <button type="submit" class="btn btn-dark btn-lg px-4 text-uppercase w-100">Update</button>
+                                }
+                            </div>
+                            <div class="col-6">
+                                <a asp-controller="Company" asp-action="Index" class="btn btn-light btn-lg text-muted w-100 text-uppercase rounded-3 transition px-4 hover-shadow">
+                                    Back to List
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-shadow {
+        transition: all 0.2s ease-in-out !important;
+    }
+
+        .hover-shadow:hover {
+            background-color: #e9ecef !important;
+            transform: translateY(-1px);
+            box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+        }
+</style>
+

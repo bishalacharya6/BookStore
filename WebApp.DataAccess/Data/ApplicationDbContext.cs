@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Web.Models;
 
 namespace Web.DataAccess.Data
@@ -17,97 +18,46 @@ namespace Web.DataAccess.Data
         public DbSet<Catagory> Catagories { get; set; }
         public DbSet<Product> Product { get; set; }
         public DbSet<ApplicationUsers> ApplicationUsers { get; set; }
+        public DbSet<ShoppingCart> ShoppingCarts { get; set; }
+        public DbSet<Company> Company { get; set; }
+            
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Product>().HasData(
-
-                new Product
+            modelBuilder.Entity<Company>().HasData(
+                new Company
                 {
                     Id = 1,
-                    Title = "Fortune of Time",
-                    Author = "Billy Spark",
-                    Description = "Praesent vitae sodales libero. Praesent molestie orci augue, vitae euismod velit sollicitudin ac. Praesent vestibulum facilisis nibh ut ultricies.\r\n\r\nNunc malesuada viverra ipsum sit amet tincidunt. ",
-                    ISBN = "SWD9999001",
-                    ListPrice = 99,
-                    Price = 90,
-                    Price50 = 85,
-                    Price100 = 80,
-                    CatagoryId = 18,
-                    ImageUrl = ""
+                    Name = "TechCorp",
+                    StreetAddress = "123 Innovation Drive",
+                    City = "Techville",
+                    State = "CA",
+                    PostalCode = "90210",
+                    PhoneNumber = 1234567890
                 },
-                new Product
+                new Company
                 {
                     Id = 2,
-                    Title = "Dark Skies",
-                    Author = "Nancy Hoover",
-                    Description = "Praesent vitae sodales libero. Praesent molestie orci augue, vitae euismod velit sollicitudin ac. Praesent vestibulum facilisis nibh ut ultricies.\r\n\r\nNunc malesuada viverra ipsum sit amet tincidunt. ",
-                    ISBN = "CAW777777701",
-                    ListPrice = 40,
-                    Price = 30,
-                    Price50 = 25,
-                    Price100 = 20,
-                    CatagoryId = 18,
-                    ImageUrl = ""
+                    Name = "Green Solutions",
+                    StreetAddress = "456 Eco Street",
+                    City = "Greenfield",
+                    State = "TX",
+                    PostalCode = "73301",
+                    PhoneNumber = 9876543210
                 },
-                new Product
+                new Company
                 {
                     Id = 3,
-                    Title = "Vanish in the Sunset",
-                    Author = "Julian Button",
-                    Description = "Praesent vitae sodales libero. Praesent molestie orci augue, vitae euismod velit sollicitudin ac. Praesent vestibulum facilisis nibh ut ultricies.\r\n\r\nNunc malesuada viverra ipsum sit amet tincidunt. ",
-                    ISBN = "RITO5555501",
-                    ListPrice = 55,
-                    Price = 50,
-                    Price50 = 40,
-                    Price100 = 35,
-                    CatagoryId = 19,
-                    ImageUrl = ""
-                },
-                new Product
-                {
-                    Id = 4,
-                    Title = "Cotton Candy",
-                    Author = "Abby Muscles",
-                    Description = "Praesent vitae sodales libero. Praesent molestie orci augue, vitae euismod velit sollicitudin ac. Praesent vestibulum facilisis nibh ut ultricies.\r\n\r\nNunc malesuada viverra ipsum sit amet tincidunt. ",
-                    ISBN = "WS3333333301",
-                    ListPrice = 70,
-                    Price = 65,
-                    Price50 = 60,
-                    Price100 = 55,
-                    CatagoryId = 19,
-                    ImageUrl = ""
-                },
-                new Product
-                {
-                    Id = 5,
-                    Title = "Rock in the Ocean",
-                    Author = "Ron Parker",
-                    Description = "Praesent vitae sodales libero. Praesent molestie orci augue, vitae euismod velit sollicitudin ac. Praesent vestibulum facilisis nibh ut ultricies.\r\n\r\nNunc malesuada viverra ipsum sit amet tincidunt. ",
-                    ISBN = "SOTJ1111111101",
-                    ListPrice = 30,
-                    Price = 27,
-                    Price50 = 25,
-                    Price100 = 20,
-                    CatagoryId = 20,
-                    ImageUrl = ""
-                },
-                new Product
-                {
-                    Id = 6,
-                    Title = "Leaves and Wonders",
-                    Author = "Laura Phantom",
-                    Description = "Praesent vitae sodales libero. Praesent molestie orci augue, vitae euismod velit sollicitudin ac. Praesent vestibulum facilisis nibh ut ultricies.\r\n\r\nNunc malesuada viverra ipsum sit amet tincidunt. ",
-                    ISBN = "FOT000000001",
-                    ListPrice = 25,
-                    Price = 23,
-                    Price50 = 22,
-                    Price100 = 20,
-                    CatagoryId = 20,
-                    ImageUrl =""
+                    Name = "Blue Ocean Industries",
+                    StreetAddress = "789 Ocean Avenue",
+                    City = "Seaside",
+                    State = "FL",
+                    PostalCode = "33101",
+                    PhoneNumber = 5551234567
                 }
-                );
+            );
+
         }
 
     }
