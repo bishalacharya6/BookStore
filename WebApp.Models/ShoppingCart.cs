@@ -20,7 +20,10 @@ namespace Web.Models
         public int Count { get; set; }
 
         public string ApplicationUserId { get; set; }
-        [ForeignKey("ApplicaionUserId")]
+        [ForeignKey("ApplicationUserId")]
         public ApplicationUsers ApplicatoinUser { get; set; }
+
+        [NotMapped]
+        public double Price { get; set; }
     }
 }
