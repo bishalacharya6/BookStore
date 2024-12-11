@@ -23,11 +23,12 @@ namespace WebApp.Areas.Customer.Controllers
 
             shoppingCartViewModel = new()
             {
-                ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId, includeProperties: "Product")
+                ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId, includeProperties: "Product"),
+                OrderHeader = new OrderHeader()
             };
 
             // Using LINQ, cleaner and readable. 
-            shoppingCartViewModel.OrderTotal = shoppingCartViewModel.ShoppingCartList.Sum(cart =>
+            shoppingCartViewModel.OrderHeader.OrderTotal = shoppingCartViewModel.ShoppingCartList.Sum(cart =>
             {
                 cart.Price = GetPriceBasedOnQuantity(cart);
                 return cart.Count * cart.Price;
