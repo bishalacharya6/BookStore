@@ -24,8 +24,8 @@ namespace Web.Models
         [ForeignKey("ProductId")]
         [ValidateNever]
         public Product Product { get; set; }    
-        public int count { get; set; }
-        public double price { get; set; }   
+        public int Count { get; set; }
+        public double Price { get; set; }   
         
     }
 }

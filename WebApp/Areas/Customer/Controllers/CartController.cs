@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Numerics;
 using System.Security.Claims;
 using Web.DataAccess;
 using Web.DataAccess.Repository;
 using Web.Models;
 using Web.Models.ViewModels;
+using Web.Utility;
 
 namespace WebApp.Areas.Customer.Controllers
 {
@@ -11,6 +13,7 @@ namespace WebApp.Areas.Customer.Controllers
     public class CartController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
+        [BindProperty]
         public ShoppingCartViewModel shoppingCartViewModel { get; set; }
         public CartController(IUnitOfWork unitOfWork)
         {
@@ -46,9 +49,101 @@ namespace WebApp.Areas.Customer.Controllers
         
         public IActionResult Summary()
         {
-            return View("Summary");
+
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            shoppingCartViewModel = new()
+            {
+                ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId, includeProperties: "Product"),
+                OrderHeader = new OrderHeader()
+            };
+
+            shoppingCartViewModel.OrderHeader.OrderTotal = shoppingCartViewModel.ShoppingCartList.Sum(cart =>
+            {
+                cart.Price = GetPriceBasedOnQuantity(cart);
+                return cart.Count * cart.Price;
+            });
+
+            return View(shoppingCartViewModel);
         }
 
+        [HttpPost]
+        [ActionName("Summary")]
+        public IActionResult SummaryPost()
+        {
+
+            if (ModelState.IsValid)
+            {
+                var claimsIdentity = (ClaimsIdentity)User.Identity;
+                var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+                shoppingCartViewModel.ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId,
+                    includeProperties: "Product");
+
+                shoppingCartViewModel.OrderHeader.OrderDate = System.DateTime.Now;
+                shoppingCartViewModel.OrderHeader.ApplicationUserId = userId;
+
+                // this is right way 
+                ApplicationUsers applicationUsers = _unitOfWork.ApplicationUser.Get(u => u.Id == userId);
+
+                // this is wrong way
+                // shoppingCartViewModel.OrderHeader.ApplicationUsers = _unitOfWork.ApplicationUser.Get(u => u.Id == userId);
+
+
+                shoppingCartViewModel.OrderHeader.OrderTotal = shoppingCartViewModel.ShoppingCartList.Sum(cart =>
+                {
+                    cart.Price = GetPriceBasedOnQuantity(cart);
+                    return cart.Count * cart.Price;
+                });
+
+                // To check if Order is made by normal user or company user
+                if (applicationUsers.CompanyId.GetValueOrDefault() == 0)
+                {
+                    // Normal User
+                    shoppingCartViewModel.OrderHeader.PaymentStatus = PaymenetManagement.PaymentStatusPending;
+                    shoppingCartViewModel.OrderHeader.OrderStatus = PaymenetManagement.StatusPending;
+                }
+                else
+                {
+                    // Company User
+                    shoppingCartViewModel.OrderHeader.PaymentStatus = PaymenetManagement.PaymentStatusDelayedPayment;
+                    shoppingCartViewModel.OrderHeader.OrderStatus = PaymenetManagement.StatusPending;
+
+                }
+
+
+                _unitOfWork.OrderHeader.Add(shoppingCartViewModel.OrderHeader);
+                _unitOfWork.Save();
+
+                foreach (var cart in shoppingCartViewModel.ShoppingCartList)
+                {
+                    OrderDetail detail = new()
+                    {
+                        ProductId = cart.ProductId,
+                        OrderHeaderId = shoppingCartViewModel.OrderHeader.Id,
+                        Price = cart.Price,
+                        Count = cart.Count
+                    };
+                    _unitOfWork.OrderDetail.Add(detail);
+                    _unitOfWork.Save();
+                }
+
+				return RedirectToAction(nameof(OrderConfirmation), new { id = shoppingCartViewModel.OrderHeader.Id });
+			}
+            else
+            {
+				TempData["error"] = "Error Occurred";
+				return RedirectToAction(nameof(Summary), shoppingCartViewModel); // Return the same view with the model to display errors
+			}
+
+
+		}
+
+        public IActionResult OrderConfirmation (int id )
+        {
+            return View(id);
+        }
 
 
         public IActionResult Plus(int cartId)
@@ -60,6 +155,7 @@ namespace WebApp.Areas.Customer.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
 
         public IActionResult Minus(int cartId)
         {
@@ -88,7 +184,6 @@ namespace WebApp.Areas.Customer.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
 
 
         private double GetPriceBasedOnQuantity(ShoppingCart cart)
