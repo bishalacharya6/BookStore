@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Stripe.Checkout;
 using System.Numerics;
 using System.Security.Claims;
 using Web.DataAccess;
@@ -73,75 +75,134 @@ namespace WebApp.Areas.Customer.Controllers
         public IActionResult SummaryPost()
         {
 
-            if (ModelState.IsValid)
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            shoppingCartViewModel.ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId,
+                includeProperties: "Product");
+
+            shoppingCartViewModel.OrderHeader.OrderDate = System.DateTime.Now;
+            shoppingCartViewModel.OrderHeader.ApplicationUserId = userId;
+
+            // this is right way 
+            ApplicationUsers applicationUsers = _unitOfWork.ApplicationUser.Get(u => u.Id == userId);
+
+            // this is wrong way
+            // shoppingCartViewModel.OrderHeader.ApplicationUsers = _unitOfWork.ApplicationUser.Get(u => u.Id == userId);
+
+
+            shoppingCartViewModel.OrderHeader.OrderTotal = shoppingCartViewModel.ShoppingCartList.Sum(cart =>
             {
-                var claimsIdentity = (ClaimsIdentity)User.Identity;
-                var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+                cart.Price = GetPriceBasedOnQuantity(cart);
+                return cart.Count * cart.Price;
+            });
 
-                shoppingCartViewModel.ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId,
-                    includeProperties: "Product");
-
-                shoppingCartViewModel.OrderHeader.OrderDate = System.DateTime.Now;
-                shoppingCartViewModel.OrderHeader.ApplicationUserId = userId;
-
-                // this is right way 
-                ApplicationUsers applicationUsers = _unitOfWork.ApplicationUser.Get(u => u.Id == userId);
-
-                // this is wrong way
-                // shoppingCartViewModel.OrderHeader.ApplicationUsers = _unitOfWork.ApplicationUser.Get(u => u.Id == userId);
-
-
-                shoppingCartViewModel.OrderHeader.OrderTotal = shoppingCartViewModel.ShoppingCartList.Sum(cart =>
-                {
-                    cart.Price = GetPriceBasedOnQuantity(cart);
-                    return cart.Count * cart.Price;
-                });
-
-                // To check if Order is made by normal user or company user
-                if (applicationUsers.CompanyId.GetValueOrDefault() == 0)
-                {
-                    // Normal User
-                    shoppingCartViewModel.OrderHeader.PaymentStatus = PaymenetManagement.PaymentStatusPending;
-                    shoppingCartViewModel.OrderHeader.OrderStatus = PaymenetManagement.StatusPending;
-                }
-                else
-                {
-                    // Company User
-                    shoppingCartViewModel.OrderHeader.PaymentStatus = PaymenetManagement.PaymentStatusDelayedPayment;
-                    shoppingCartViewModel.OrderHeader.OrderStatus = PaymenetManagement.StatusPending;
-
-                }
-
-
-                _unitOfWork.OrderHeader.Add(shoppingCartViewModel.OrderHeader);
-                _unitOfWork.Save();
-
-                foreach (var cart in shoppingCartViewModel.ShoppingCartList)
-                {
-                    OrderDetail detail = new()
-                    {
-                        ProductId = cart.ProductId,
-                        OrderHeaderId = shoppingCartViewModel.OrderHeader.Id,
-                        Price = cart.Price,
-                        Count = cart.Count
-                    };
-                    _unitOfWork.OrderDetail.Add(detail);
-                    _unitOfWork.Save();
-                }
-
-				return RedirectToAction(nameof(OrderConfirmation), new { id = shoppingCartViewModel.OrderHeader.Id });
-			}
+            // To check if Order is made by normal user or company user
+            if (applicationUsers.CompanyId.GetValueOrDefault() == 0)
+            {
+                // Normal User
+                shoppingCartViewModel.OrderHeader.PaymentStatus = PaymenetManagement.PaymentStatusPending;
+                shoppingCartViewModel.OrderHeader.OrderStatus = PaymenetManagement.StatusPending;
+            }
             else
             {
-				TempData["error"] = "Error Occurred";
-				return RedirectToAction(nameof(Summary), shoppingCartViewModel); // Return the same view with the model to display errors
+                // Company User
+                shoppingCartViewModel.OrderHeader.PaymentStatus = PaymenetManagement.PaymentStatusDelayedPayment;
+                shoppingCartViewModel.OrderHeader.OrderStatus = PaymenetManagement.StatusPending;
+
+            }
+
+
+            _unitOfWork.OrderHeader.Add(shoppingCartViewModel.OrderHeader);
+            _unitOfWork.Save();
+
+            foreach (var cart in shoppingCartViewModel.ShoppingCartList)
+            {
+                OrderDetail detail = new()
+                {
+                    ProductId = cart.ProductId,
+                    OrderHeaderId = shoppingCartViewModel.OrderHeader.Id,
+                    Price = cart.Price,
+                    Count = cart.Count
+                };
+                _unitOfWork.OrderDetail.Add(detail);
+                _unitOfWork.Save();
+            }
+
+            if (applicationUsers.CompanyId.GetValueOrDefault() == 0) 
+            {
+                var DOMAIN = "http://localhost:5073";
+				var successDomain = DOMAIN + $"/customer/cart/OrderConfirmation?id={shoppingCartViewModel.OrderHeader.Id}";
+                var cancelDomain = DOMAIN + $"/customer/cart/index";
+                    
+				var options = new SessionCreateOptions
+				{
+					LineItems = new List<SessionLineItemOptions>(),
+					Mode = "payment",
+					SuccessUrl = successDomain,
+					CancelUrl = cancelDomain,
+				};
+
+                foreach(var item in shoppingCartViewModel.ShoppingCartList)
+                {
+                    var sessionLineItem = new SessionLineItemOptions
+                    {
+                        PriceData = new SessionLineItemPriceDataOptions
+                        {
+                            UnitAmount = (long)(item.Price * 100), //  $20.50 = 2050
+                            Currency = "USD",
+                            ProductData = new SessionLineItemPriceDataProductDataOptions
+                            {
+                                Name = item.Product.Title
+                            }
+                        },
+                        Quantity = item.Count
+                    };
+                    options.LineItems.Add(sessionLineItem);
+                }   
+
+				var service = new SessionService();
+				Session session = service.Create(options);
+
+                _unitOfWork.OrderHeader.UpdateStripePaymentStatus(shoppingCartViewModel.OrderHeader.Id, session.Id, session.PaymentIntentId);
+                _unitOfWork.Save();
+
+                Response.Headers.Add("Location", session.Url);
+                return new StatusCodeResult(303);
+
 			}
+
+
+			return RedirectToAction(nameof(OrderConfirmation), new { id = shoppingCartViewModel.OrderHeader.Id });
+			
 
 
 		}
 
         public IActionResult OrderConfirmation (int id )
         {
+            OrderHeader orderHeader = _unitOfWork.OrderHeader.Get(u =>  u.Id == id, includeProperties: "ApplicationUsers");
+            if(orderHeader.PaymentStatus != PaymenetManagement.PaymentStatusDelayedPayment)
+            {
+                var service = new SessionService();
+                Session session = service.Get(orderHeader.SessionId);
+
+                if(session.PaymentStatus.ToLower() == "paid")
+                {
+                    _unitOfWork.OrderHeader.UpdateStripePaymentStatus(id, session.Id, session.PaymentIntentId);
+                    _unitOfWork.OrderHeader.UpdateStatus(id, session.Id, PaymenetManagement.PaymentStatusApproved);
+                    _unitOfWork.Save();
+
+                }
+            }
+
+            List<ShoppingCart> shoppingCarts = _unitOfWork.ShoppingCart.
+                GetAll(u => u.ApplicationUserId == orderHeader.ApplicationUserId).ToList();
+
+            _unitOfWork.ShoppingCart.RemoveRange(shoppingCarts);
+            _unitOfWork.Save();
+
+
             return View(id);
         }
 
