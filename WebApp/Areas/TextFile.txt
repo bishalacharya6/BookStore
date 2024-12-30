@@ -1,0 +1,5 @@
+﻿login ids
+
+company - companyemail@gmail.com - Company@123
+admin - newadmin@gmail.com	- NewAdmin@123
+user - bishal12@gmail.com - Bishal@123

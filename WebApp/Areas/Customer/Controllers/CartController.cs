@@ -108,7 +108,7 @@ namespace WebApp.Areas.Customer.Controllers
             {
                 // Company User
                 shoppingCartViewModel.OrderHeader.PaymentStatus = PaymenetManagement.PaymentStatusDelayedPayment;
-                shoppingCartViewModel.OrderHeader.OrderStatus = PaymenetManagement.StatusPending;
+                shoppingCartViewModel.OrderHeader.OrderStatus = PaymenetManagement.StatusApproved;
 
             }
 
@@ -129,6 +129,8 @@ namespace WebApp.Areas.Customer.Controllers
                 _unitOfWork.Save();
             }
 
+
+            // Stripe Logic
             if (applicationUsers.CompanyId.GetValueOrDefault() == 0) 
             {
                 var DOMAIN = "http://localhost:5073";
@@ -190,9 +192,8 @@ namespace WebApp.Areas.Customer.Controllers
                 if(session.PaymentStatus.ToLower() == "paid")
                 {
                     _unitOfWork.OrderHeader.UpdateStripePaymentStatus(id, session.Id, session.PaymentIntentId);
-                    _unitOfWork.OrderHeader.UpdateStatus(id, session.Id, PaymenetManagement.PaymentStatusApproved);
+                    _unitOfWork.OrderHeader.UpdateStatus(id, PaymenetManagement.StatusApproved, PaymenetManagement.PaymentStatusApproved);
                     _unitOfWork.Save();
-
                 }
             }
 

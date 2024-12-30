@@ -1,0 +1,121 @@
+﻿@model IEnumerable<OrderHeader>
+<div class="container-fluid px-4 my-2">
+    <div class="row mb-2 align-items-center">
+        <div class="col-6">
+            <h1 class="display-6 fw-bold">Order Management</h1>
+        </div>
+        <div class="col-6">
+            <span></span>
+            <ul class="list-group list-group-horizontal-sm justify-content-end">
+                <a style="text-decoration:none;" asp-controller="Order" asp-action="Index" asp-route-status="inprocess">
+                <li class="list-group-item @(Context.Request.Query["status"] == "inprocess" ? "active" : "")">In Process</li>
+                </a>
+                <a style="text-decoration:none;" asp-controller="Order" asp-action="Index" asp-route-status="pending">
+                <li class="list-group-item @(Context.Request.Query["status"] == "pending" ? "active" : "")">Payment Pending</li>
+                </a>
+                <a style="text-decoration:none;" asp-controller="Order" asp-action="Index" asp-route-status="complete">
+                <li class="list-group-item @(Context.Request.Query["status"] == "complete" ? "active" : "")">Completed</li>
+                </a>
+                <a style="text-decoration:none;" asp-controller="Order" asp-action="Index" asp-route-status="approved">
+                <li class="list-group-item @(Context.Request.Query["status"] == "approved" ? "active" : "")">Approved</li>
+                </a>
+                <a style="text-decoration:none;" asp-controller="Order" asp-action="Index" asp-route-status="all">
+                <li class="list-group-item @(Context.Request.Query["status"] == "all" ? "active" :"")">All</li>
+                </a>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                <table class="table table-striped table-bordered table-hover mb-0">
+                    <thead class="table-dark sticky-top">
+                        <tr>
+                            <th class="text-center">
+                                <input type="checkbox" class="form-check-input" id="selectAll">
+                            </th>
+                            <th>Order ID</th>
+                            <th>Customer Name</th>
+                            <th>Phone Number</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Total Amount</th>
+                            <th class="text-center">Order Detail</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var obj in Model)
+                        {
+                            <tr>
+                                <td class="text-center">
+                                    <input type="checkbox" class="form-check-input" id="check-@obj.Id">
+                                </td>
+                                <td>@obj.Id</td>
+                                <td>@obj.Name</td>
+                                <td>@obj.PhoneNumber</td>
+                                <td>@obj.ApplicationUsers.Email</td>
+                                <td>
+                                    <span class="badge
+                                        @(obj.OrderStatus == "Pending" ? "bg-warning" :
+                                          obj.OrderStatus == "Approved" ? "bg-success" :
+                                          obj.OrderStatus == "Cancelled" ? "bg-danger" : "bg-secondary")">
+                                        @obj.OrderStatus
+                                    </span>
+                                </td>
+                                <td class="text-end">@obj.OrderTotal.ToString("C")</td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="Details" asp-route-orderId="@obj.Id" class="btn btn-info text-white" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-between align-items-center py-3">
+            <span class="text-muted">Showing @Model.Count() of @Model.Count() entries</span>
+            <nav>
+                <ul class="pagination mb-0">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1">Previous</a>
+                    </li>
+                    <li class="page-item active">
+                        <a class="page-link" href="#">1</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">2</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table-responsive {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(0,0,0,.2) transparent;
+    }
+
+        .table-responsive::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background-color: rgba(0,0,0,.2);
+            border-radius: 4px;
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(0,0,0,.075);
+        transition: background-color 0.3s ease;
+    }
+</style>
